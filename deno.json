@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "run": "deno run -W -R -N -E src/main.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/cli": "jsr:@std/cli@^1.0.9",
+    "commander": "npm:commander@^13.0.0"
+  }
+}
