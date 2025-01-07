@@ -49,7 +49,7 @@ export default async function simulate(options: { deviceList: string, relays: st
 
 async function deviceLoop(device: SimulatedDevice, interval: number, nostrPool: NostrPool) {
   const { simulateHassState, processState } = await import(`../device-types/${device.deviceType}.ts`) as DeviceTypeImportedModule;
-  await wait(getRandomInt(-3000, 3000));
+  await wait(getRandomInt(0, 30000));
 
   while (true) {
     const hassState = simulateHassState(device);
