@@ -24,7 +24,7 @@ export function unimplemented() {
 
 export async function getKnownDeviceTypeList() {
   const devices = [];
-  for await (const entry of Deno.readDir("./src/devices")) {
+  for await (const entry of Deno.readDir("./src/device-types")) {
     if (entry.isFile && entry.name.endsWith(".ts")) {
       devices.push(entry.name.replace(/\.ts$/, ""));
     }
@@ -34,4 +34,18 @@ export async function getKnownDeviceTypeList() {
 
 export function randomDeviceType(deviceTypeList: string[]) {
   return deviceTypeList[getRandomInt(0, deviceTypeList.length - 1)];
+}
+
+export const VERBOSE_LOGGER: Logger = { info: console.log, warn: console.warn, error: console.error };
+export const QUIET_LOGGER: Logger = { info: () => { }, warn: console.warn, error: console.error };
+
+export type Logger = {
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+}
+
+export let logger: Logger = QUIET_LOGGER;
+export function setVerbose(verbose: boolean) {
+  logger = verbose ? VERBOSE_LOGGER : QUIET_LOGGER;
 }

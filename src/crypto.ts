@@ -1,6 +1,7 @@
 import { generateSecretKey, getPublicKey } from '@nostr/tools/pure'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
-
+import { TruncatedHassStateWithHash } from "./hass.ts";
+import { createStateEvent } from "./nostr.ts";
 export class SimulatedDevice {
   secretKey: Uint8Array;
   pubkeyHex: string;
@@ -28,6 +29,10 @@ export class SimulatedDevice {
     this.deviceId = this.pubkeyHex;
     this.deviceShortId = this.pubkeyHex.slice(0, 4);
     this.deviceType = deviceType;
+  }
+
+  createStateEvent(state: TruncatedHassStateWithHash[]) {
+    return createStateEvent(state, this.secretKey);
   }
 
   toCsvLine() {

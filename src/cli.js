@@ -21,14 +21,15 @@ export async function run() {
     .description("Start simulation of sending events from Home Assistant to Nostr")
     .option("-l, --device-list <id-list>", "List of Nostr IDs", "./sim-ids.csv")
     .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
-    .option("-r, --relays <relays...>", "Nostr relays", ["wss://relay.snort.social"])
+    .option("-r, --relays <relays...>", "Nostr relays", ["https://nostream.dephy.dev/"])
+    .option("-v, --verbose", "Verbose mode", false)
     .action(lazyImportAction("./cli/simulate.ts"));
 
   program.command("bridge")
     .description("Bridge Home Assistant states to Nostr")
     .option("-a, --hass-api <hass-api>", "Home Assistant API URL", "http://homeassistant.local:8123")
     .option("-t, --token <token>", "Home Assistant API token (if not set, will read from environment variable `DEPHY_HA_TOKEN`)", "")
-    .option("-r, --relays <relays...>", "Nostr relays", ["wss://relay.snort.social"])
+    .option("-r, --relays <relays...>", "Nostr relays", ["https://nostream.dephy.dev/"])
     .action(lazyImportAction("./cli/bridge.ts"));
 
   await program.parseAsync();

@@ -9,6 +9,7 @@
     "@std/cli": "jsr:@std/cli@^1.0.9",
     "@std/fs": "jsr:@std/fs@^1.0.8",
     "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/streams": "jsr:@std/streams@^1.0.8",
     "commander": "npm:commander@^13.0.0",
     "luxon": "npm:luxon@^3.5.0"
   }
