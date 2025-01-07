@@ -3,8 +3,13 @@
     "run": "deno run -W -R -N -E src/main.ts"
   },
   "imports": {
+    "@noble/hashes": "jsr:@noble/hashes@^1.7.0",
+    "@nostr/tools": "jsr:@nostr/tools@^2.10.4",
     "@std/assert": "jsr:@std/assert@1",
     "@std/cli": "jsr:@std/cli@^1.0.9",
-    "commander": "npm:commander@^13.0.0"
+    "@std/fs": "jsr:@std/fs@^1.0.8",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "commander": "npm:commander@^13.0.0",
+    "luxon": "npm:luxon@^3.5.0"
   }
 }

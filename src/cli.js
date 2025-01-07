@@ -10,15 +10,17 @@ export async function run() {
     .name("hass2nostr")
     .version("0.0.1");
 
-  program.command("gen-id")
-    .description("Generate device identities")
+  program.command("gen-sim-id")
+    .description("Generate simulated device identities")
     .option("-q, --quantity <quantity>", "Quantity of device identities to generate", 1, parseInt)
-    .option("-o, --output <output>", "Output file", "./ids.csv")
-    .action(lazyImportAction("./cli/gen-id.ts"));
+    .option("-o, --output <output>", "Output file", "./sim-ids.csv")
+    .option("-a, --append", "Append to existing file", false)
+    .action(lazyImportAction("./cli/gen-sim-device-id.ts"));
 
   program.command("simulate")
     .description("Start simulation of sending events from Home Assistant to Nostr")
-    .option("-l, --device-list <id-list>", "List of Nostr IDs", "./ids.csv")
+    .option("-l, --device-list <id-list>", "List of Nostr IDs", "./sim-ids.csv")
+    .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
     .option("-r, --relays <relays...>", "Nostr relays", ["wss://relay.snort.social"])
     .action(lazyImportAction("./cli/simulate.ts"));
 
