@@ -29,7 +29,7 @@ export function simulateHassState(device: SimulatedDevice): HassState[] {
   const nowStr = now();
 
   return [{
-    "entity_id": `sensor.${device.deviceShortId}_total_dissolved_solids_for_input_water`,
+    "entity_id": `sensor.chunmi_tsa1_${device.deviceShortId}_total_dissolved_solids_for_input_water`,
     "state": tdsIn.toString(),
     "attributes": {
       "state_class": "measurement",
@@ -48,7 +48,7 @@ export function simulateHassState(device: SimulatedDevice): HassState[] {
     }
   },
   {
-    "entity_id": `sensor.${device.deviceShortId}_total_dissolved_solids_for_output_water`,
+    "entity_id": `sensor.chunmi_tsa1_${device.deviceShortId}_total_dissolved_solids_for_output_water`,
     "state": tdsOut.toString(),
     "attributes": {
       "state_class": "measurement",
