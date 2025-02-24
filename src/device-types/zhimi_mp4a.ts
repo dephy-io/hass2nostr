@@ -4,7 +4,7 @@ import { getRandomInt, now } from "../utils.ts";
 import { HassState, TruncatedHassStateWithHash, truncateState } from "../hass.ts";
 import { SimulatedDevice } from "../crypto.ts";
 
-export const entityPrefix = "sensor.zhimi_mp4a_";
+export const entityPrefixes = ["sensor.zhimi_mp4a_"];
 
 export const allowedEntitySuffixes = [
   "temperature",

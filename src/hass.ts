@@ -84,10 +84,12 @@ export class HassAccessor {
     const filteredStates: TruncatedHassStateWithHash[] = [];
     for (const state of states) {
       for (const module of this.loadedDeviceTypesModules) {
-        if (state.entity_id.startsWith(module.entityPrefix)) {
-          for (const suffix of module.allowedEntitySuffixes) {
-            if (state.entity_id.endsWith(suffix)) {
-              filteredStates.push(truncateState(state, module.truncateAttributes));
+        for (const prefix of module.entityPrefixes) {
+          if (state.entity_id.startsWith(prefix)) {
+            for (const suffix of module.allowedEntitySuffixes) {
+              if (state.entity_id.endsWith(suffix)) {
+                filteredStates.push(truncateState(state, module.truncateAttributes));
+              }
             }
           }
         }
@@ -96,4 +98,3 @@ export class HassAccessor {
     return filteredStates;
   }
 }
-
