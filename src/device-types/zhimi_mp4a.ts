@@ -1,21 +1,21 @@
-// Xiaomi Desktop Purifying Water Dispenser
+// Xiaomi Smart Air Purifier 4
 
 import { getRandomInt, now } from "../utils.ts";
 import { HassState, TruncatedHassStateWithHash, truncateState } from "../hass.ts";
 import { SimulatedDevice } from "../crypto.ts";
 
-export const entityPrefix = "sensor.chunmi_tsa1_";
+export const entityPrefix = "sensor.zhimi_mp4a_";
 
 export const allowedEntitySuffixes = [
-  "total_dissolved_solids_for_input_water",
-  "total_dissolved_solids_for_output_water"
+  "temperature",
+  "relative_humidity"
 ];
 
 export const allowedAttributes = [
   "state_class",
-  "tds_sensor.tds_in",
-  "tds_sensor.tds_out",
-  "unit_of_measurement"
+  "unit_of_measurement",
+  "environment.relative_humidity",
+  "environment.temperature"
 ];
 
 export function truncateAttributes(attributes: Record<string, unknown>): Record<string, unknown> {

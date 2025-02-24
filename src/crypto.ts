@@ -2,6 +2,24 @@ import { generateSecretKey, getPublicKey } from '@nostr/tools/pure'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { TruncatedHassStateWithHash } from "./hass.ts";
 import { createStateEvent } from "./nostr.ts";
+
+export class BridgeDevice {
+  secretKey: Uint8Array;
+  pubkeyHex: string;
+
+  constructor(secretKey: string) {
+    if (!secretKey) {
+      throw new Error("Secret key is required");
+    }
+    this.secretKey = hexToBytes(secretKey);
+    this.pubkeyHex = getPublicKey(this.secretKey);
+  }
+
+  createStateEvent(state: TruncatedHassStateWithHash[]) {
+    return createStateEvent(state, this.secretKey);
+  }
+}
+
 export class SimulatedDevice {
   secretKey: Uint8Array;
   pubkeyHex: string;

@@ -1,5 +1,6 @@
 import { keccak_256 } from '@noble/hashes/sha3';
 import { bytesToHex } from "@noble/hashes/utils";
+import { DeviceTypeImportedModule } from "./device-type.ts";
 
 export function truncateState(state: HassState, truncateAttributesFn: (attributes: Record<string, unknown>) => Record<string, unknown>): TruncatedHassStateWithHash {
   const truncatedAttributes = truncateAttributesFn(state.attributes);
@@ -45,3 +46,54 @@ export type TruncatedHassStateWithHash = {
   originalHash: string;
   contextIdHash: string;
 }
+
+export class HassAccessor {
+  hassApi: string;
+  token: string;
+  loadedDeviceTypesModules: DeviceTypeImportedModule[];
+
+  constructor(hassApi: string, token: string, loadedDeviceTypesModules: DeviceTypeImportedModule[]) {
+    if (!hassApi) {
+      throw new Error("Home Assistant API URL is required");
+    }
+    if (!token) {
+      throw new Error("Home Assistant API token is required");
+    }
+    this.hassApi = hassApi;
+    this.token = token;
+    this.loadedDeviceTypesModules = loadedDeviceTypesModules;
+  }
+
+  async request(path: string, method: string, body?: Record<string, unknown>) {
+    const response = await fetch(`${this.hassApi}${path}`, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  async getStates(): Promise<TruncatedHassStateWithHash[]> {
+    const states: HassState[] = await this.request("/api/states", "GET");
+    const filteredStates: TruncatedHassStateWithHash[] = [];
+    for (const state of states) {
+      for (const module of this.loadedDeviceTypesModules) {
+        if (state.entity_id.startsWith(module.entityPrefix)) {
+          for (const suffix of module.allowedEntitySuffixes) {
+            if (state.entity_id.endsWith(suffix)) {
+              filteredStates.push(truncateState(state, module.truncateAttributes));
+            }
+          }
+        }
+      }
+    }
+    return filteredStates;
+  }
+}
+

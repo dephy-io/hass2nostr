@@ -27,9 +27,12 @@ export async function run() {
 
   program.command("bridge")
     .description("Bridge Home Assistant states to Nostr")
+    .option("-s, --secret-key <secret-key>", "DID Secret key in hex format(if not set, will read from environment variable `DEPHY_SECRET_KEY`)", "")
     .option("-a, --hass-api <hass-api>", "Home Assistant API URL", "http://homeassistant.local:8123")
+    .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
     .option("-t, --token <token>", "Home Assistant API token (if not set, will read from environment variable `DEPHY_HA_TOKEN`)", "")
     .option("-r, --relays <relays...>", "Nostr relays", ["https://nostream.dephy.dev/"])
+    .option("-w, --device-type-whitelist <devType...>", "Device types to bridge(Empty for all known types)", [])
     .action(lazyImportAction("./cli/bridge.ts"));
 
   await program.parseAsync();

@@ -7,6 +7,9 @@ export class NostrPool {
   relays: string[];
 
   constructor(relays: string[]) {
+    if (!relays.length) {
+      throw new Error("At least one Nostr relay is required");
+    }
     this.pool = new SimplePool();
     this.relays = relays;
   }
