@@ -21,7 +21,7 @@ export async function run() {
     .description("Start simulation of sending events from Home Assistant to Nostr")
     .option("-l, --device-list <id-list>", "List of Nostr IDs", "./sim-ids.csv")
     .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
-    .option("-r, --relays <relays...>", "Nostr relays", ["https://nostream.dephy.dev/"])
+    .option("-r, --relays <relays...>", "Nostr relays", ["wss://dev-relay.dephy.dev"])
     .option("-v, --verbose", "Verbose mode", false)
     .action(lazyImportAction("./cli/simulate.ts"));
 
@@ -31,7 +31,7 @@ export async function run() {
     .option("-a, --hass-api <hass-api>", "Home Assistant API URL", "http://homeassistant.local:8123")
     .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
     .option("-t, --token <token>", "Home Assistant API token (if not set, will read from environment variable `DEPHY_HA_TOKEN`)", "")
-    .option("-r, --relays <relays...>", "Nostr relays", ["https://nostream.dephy.dev/"])
+    .option("-r, --relays <relays...>", "Nostr relays", ["wss://dev-relay.dephy.dev"])
     .option("-w, --device-type-whitelist <devType...>", "Device types to bridge(Empty for all known types)", [])
     .action(lazyImportAction("./cli/bridge.ts"));
 

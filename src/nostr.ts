@@ -21,9 +21,9 @@ export class NostrPool {
 
 export function createStateEvent(state: TruncatedHassStateWithHash[], sk: Uint8Array) {
   return finalizeEvent({
-    kind: 1,
+    kind: 1573,
     content: JSON.stringify(state),
     created_at: Math.floor(Date.now() / 1000),
-    tags: [],
+    tags: [["s", "0"]],
   }, sk);
 }
