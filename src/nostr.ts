@@ -2,6 +2,7 @@ import { SimplePool } from "@nostr/tools/pool";
 import { Event, finalizeEvent } from "@nostr/tools/pure";
 import { TruncatedHassStateWithHash } from "./hass.ts";
 
+
 export class NostrPool {
   pool: SimplePool;
   relays: string[];
@@ -20,10 +21,15 @@ export class NostrPool {
 }
 
 export function createStateEvent(state: TruncatedHassStateWithHash[], sk: Uint8Array) {
+  const createdAt = Math.floor(Date.now() / 1000);
+  const expiration = createdAt + 3600; // 1 hour later
   return finalizeEvent({
     kind: 1573,
     content: JSON.stringify(state),
-    created_at: Math.floor(Date.now() / 1000),
-    tags: [["s", "0"]],
+    created_at: createdAt,
+    tags: [
+      ["s", "0"],
+      ["expiration", expiration.toString()],
+    ],
   }, sk);
 }
