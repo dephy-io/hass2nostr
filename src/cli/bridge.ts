@@ -41,6 +41,8 @@ async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nost
   const hassStates = await hassAccessor.getStates();
   console.log(`[${Date.now()}] Got ${hassStates.length} states`);
 
+  console.log("hassStates:", hassStates)
+
   const event = device.createStateEvent(hassStates);
   await nostrPool.publish(event);
   console.log(`[${Date.now()}] Published event to Nostr`);

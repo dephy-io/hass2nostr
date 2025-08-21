@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "deno run -W -R -N -E src/main.ts"
+    "run": "deno run -W -R -N -E --env src/main.ts"
   },
   "imports": {
     "@noble/hashes": "jsr:@noble/hashes@^1.7.1",
