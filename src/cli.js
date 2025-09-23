@@ -33,6 +33,9 @@ export async function run() {
     .option("-t, --token <token>", "Home Assistant API token (if not set, will read from environment variable `DEPHY_HA_TOKEN`)", "")
     .option("-r, --relays <relays...>", "Nostr relays", ["wss://dev-relay.dephy.dev"])
     .option("-w, --device-type-whitelist <devType...>", "Device types to bridge(Empty for all known types)", [])
+    .option("-o, --topic <topic>", "Relay topic stream")
+    .option("-m, --mention <mention>", "Controller pubkey")
+
     .action(lazyImportAction("./cli/bridge.ts"));
 
   await program.parseAsync();

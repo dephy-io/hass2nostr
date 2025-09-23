@@ -6,17 +6,24 @@ import { createStateEvent } from "./nostr.ts";
 export class BridgeDevice {
   secretKey: Uint8Array;
   pubkeyHex: string;
+  topic?: string;
+  mention?: string;
 
-  constructor(secretKey: string) {
+  constructor(secretKey: string, topic?: string, mention?: string) {
     if (!secretKey) {
       throw new Error("Secret key is required");
     }
     this.secretKey = hexToBytes(secretKey);
     this.pubkeyHex = getPublicKey(this.secretKey);
+    this.topic = topic;
+    this.mention = mention;
+    console.log("pubkey:", this.pubkeyHex)
+    console.log("topic:", this.topic)
+    console.log("mention:", this.mention)
   }
 
   createStateEvent(state: TruncatedHassStateWithHash[]) {
-    return createStateEvent(state, this.secretKey);
+    return createStateEvent(state, this.secretKey, this.topic, this.mention);
   }
 }
 

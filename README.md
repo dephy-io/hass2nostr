@@ -17,6 +17,9 @@
 
   # Simulate devices (Verbose Mode)
   deno task run simulate -v
+
+  # Bridge real data
+  deno task run bridge -r wss://canary-relay.dephy.dev -w qingping_air_monitor -o qingping_air_monitor --mention 79136d62dd58d589891ce4170851bbdcd25ace722ef9887694ec628fcee3d780
 ```
 
 ## Device Types
