@@ -40,7 +40,7 @@ export function createStateEvent(
   const expiration = createdAt + 3600; // 1 hour later
 
   const tags: string[][] = [
-    ["s", "dephy-streamr"],
+    ["s", "dephy-stream"],
     ["expiration", expiration.toString()],
   ];
   if (topic) tags.push(["t", topic]);

@@ -19,7 +19,7 @@
   deno task run simulate -v
 
   # Bridge real data
-  deno task run bridge -r wss://canary-relay.dephy.dev -w qingping_air_monitor -o qingping_air_monitor --mention 79136d62dd58d589891ce4170851bbdcd25ace722ef9887694ec628fcee3d780
+  deno task run bridge -r wss://canary-relay.dephy.dev -w qingping_air_monitor -o qingping_air_monitor --mention cdb9247ec7ab3302fd12450ae7453ab9f833639f109833f06c5d909991d62a3c
 ```
 
 ## Device Types

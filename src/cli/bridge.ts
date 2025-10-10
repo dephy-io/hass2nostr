@@ -26,7 +26,7 @@ export default async function bridge(options: {
     : currentDeviceTypes;
 
   console.log("Loaded device types:", loadedDeviceTypes);
-  
+
   const loadedDeviceTypesModules = await Promise.all(loadedDeviceTypes.map(deviceType => import(`../device-types/${deviceType}.ts`) as unknown as DeviceTypeImportedModule));
   const hassAccessor = new HassAccessor(options.hassApi, options.token || Deno.env.get("DEPHY_HA_TOKEN") || "", loadedDeviceTypesModules);
 
@@ -43,9 +43,17 @@ export default async function bridge(options: {
 
 async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nostrPool: NostrPool) {
   const hassStates = await hassAccessor.getStates();
-  console.log(`[${Date.now()}] Got ${hassStates.length} states`);
+  // if state not a number, skip
+  hassStates.forEach(state => {
+    if (isNaN(Number(state.truncatedState.state))) {
+      console.log(`${state.truncatedState.entity_id} state is not a number, skipping`);
+      return;
+    }
+  });
+
+  console.log(`[${new Date().toISOString()}] Got ${hassStates.length} states`);
 
   const event = device.createStateEvent(hassStates);
   await nostrPool.publish(event);
-  console.log(`[${Date.now()}] Published event to Nostr`);
+  console.log(`[${new Date().toISOString()}] Published event to Nostr`);
 }
