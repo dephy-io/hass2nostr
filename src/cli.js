@@ -10,19 +10,14 @@ export async function run() {
     .name("hass2nostr")
     .version("0.0.1");
 
-  program.command("gen-sim-id")
-    .description("Generate simulated device identities")
-    .option("-q, --quantity <quantity>", "Quantity of device identities to generate", 1, parseInt)
-    .option("-o, --output <output>", "Output file", "./sim-ids.csv")
-    .option("-a, --append", "Append to existing file", false)
-    .action(lazyImportAction("./cli/gen-sim-device-id.ts"));
-
   program.command("simulate")
     .description("Start simulation of sending events from Home Assistant to Nostr")
-    .option("-l, --device-list <id-list>", "List of Nostr IDs", "./sim-ids.csv")
+    .option("-s, --secret-key <secret-key>", "DID Secret key in hex format (if not set, will read from environment variable `DEPHY_SECRET_KEY`)", "")
     .option("-i, --interval <interval>", "Interval between events", 10000, parseInt)
     .option("-r, --relays <relays...>", "Nostr relays", ["wss://dev-relay.dephy.dev"])
-    .option("-v, --verbose", "Verbose mode", false)
+    .option("-w, --device-type-whitelist <devType...>", "Device types to simulate (Empty for all known types)", [])
+    .option("-o, --topic <topic>", "Topic name to publish simulated events to")
+    .option("-m, --mention <mention>", "Controller pubkey to mention in simulated events")
     .action(lazyImportAction("./cli/simulate.ts"));
 
   program.command("bridge")
@@ -35,7 +30,6 @@ export async function run() {
     .option("-w, --device-type-whitelist <devType...>", "Device types to bridge(Empty for all known types)", [])
     .option("-o, --topic <topic>", "Relay topic stream")
     .option("-m, --mention <mention>", "Controller pubkey")
-
     .action(lazyImportAction("./cli/bridge.ts"));
 
   await program.parseAsync();

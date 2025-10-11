@@ -9,17 +9,11 @@
   # Install dependencies
   deno install
 
-  # Generate 10 simulated device IDs
-  deno task run gen-sim-id -q 10
-
   # Simulate devices
-  deno task run simulate
-
-  # Simulate devices (Verbose Mode)
-  deno task run simulate -v
+  deno task run simulate -r wss://canary-relay.dephy.dev -w chunmi_tsa1 -o playground -m cdb9247ec7ab3302fd12450ae7453ab9f833639f109833f06c5d909991d62a3c
 
   # Bridge real data
-  deno task run bridge -r wss://canary-relay.dephy.dev -w qingping_air_monitor -o qingping_air_monitor --mention cdb9247ec7ab3302fd12450ae7453ab9f833639f109833f06c5d909991d62a3c
+  deno task run bridge -r wss://canary-relay.dephy.dev -w qingping_air_monitor -o qingping_air_monitor -m cdb9247ec7ab3302fd12450ae7453ab9f833639f109833f06c5d909991d62a3c
 ```
 
 ## Device Types

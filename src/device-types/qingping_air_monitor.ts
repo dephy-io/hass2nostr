@@ -7,11 +7,11 @@ import { SimulatedDevice } from "../crypto.ts";
 export const entityPrefixes = ["sensor.cgllc_cn_584163775_cgd1st_"];
 
 export const allowedEntitySuffixes = [
-  "co2_density_p_3_8", //  二氧化碳浓度
-  "pm2_5_density_p_3_4", //  PM2.5 浓度
-  "pm10_density_p_3_5", //  PM10 浓度
-  "temperature_p_3_7", //  温度
-  "relative_humidity_p_3_1" //  相对湿度
+  "co2_density_p_3_8", //  CO2 density
+  "pm2_5_density_p_3_4", //  PM2.5 density
+  "pm10_density_p_3_5", //  PM10 density
+  "temperature_p_3_7", //  temperature
+  "relative_humidity_p_3_1" //  relative_humidity
 ];
 
 export const allowedAttributes = [

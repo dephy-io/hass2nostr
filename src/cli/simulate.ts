@@ -1,66 +1,52 @@
 import type { Command } from "commander";
-import { resolve } from "@std/path";
-import { TextLineStream } from "@std/streams";
+// ...existing code...
 import { SimulatedDevice } from "../crypto.ts";
-import { getKnownDeviceTypeList, getRandomInt, wait, logger, setVerbose } from "../utils.ts";
+import { getKnownDeviceTypeList, getRandomInt, wait } from "../utils.ts";
 import { DeviceTypeImportedModule } from "../device-type.ts";
 import { NostrPool } from "../nostr.ts";
 
 
-export default async function simulate(options: { deviceList: string, relays: string[], interval: number, verbose: boolean }, _command: Command) {
-  setVerbose(options.verbose);
-
-  const deviceListPath = resolve(options.deviceList);
-  const deviceListFile = await Deno.open(deviceListPath, { read: true });
-  const deviceListStream = deviceListFile.readable
-    .pipeThrough(new TextDecoderStream())
-    .pipeThrough(new TextLineStream());
+export default async function simulate(options: { secretKey?: string, relays: string[], interval: number, verbose: boolean, deviceTypeWhitelist: string[], topic?: string, mention?: string }, _command: Command) {
+  const interval = options.interval;
+  const nostrPool = new NostrPool(options.relays);
+  const secretKey = options.secretKey || Deno.env.get("DEPHY_SECRET_KEY") || "";
+  if (!secretKey) throw new Error("Secret key is required (pass -s or set DEPHY_SECRET_KEY)");
 
   const currentDeviceTypes = await getKnownDeviceTypeList();
-  const deviceList: SimulatedDevice[] = [];
 
-  for await (const data of deviceListStream) {
-    if (data.length === 0) {
-      continue;
-    }
-    try {
-      const device = SimulatedDevice.fromCsvLine(data);
-      if (currentDeviceTypes.includes(device.deviceType)) {
-        if (deviceList.some(d => d.deviceId === device.deviceId)) {
-          logger.warn(`[!!!WARN!!!] Found duplicated device ID ${device.deviceId}`);
-        } else {
-          deviceList.push(device);
-        }
-      } else {
-        logger.warn(`[!!!WARN!!!] Found unknown device type: ${device.deviceType} with device ${device.deviceId}`);
-      }
-    } catch (e) {
-      logger.error(`Error parsing device: ${data}`, e);
-    }
-  }
-  logger.info(`Loaded ${deviceList.length} devices from ${deviceListPath}`);
+  const deviceTypeWhitelist = options.deviceTypeWhitelist.map(type => type.trim().toLowerCase());
+  const loadedDeviceTypes = deviceTypeWhitelist.length > 0
+    ? currentDeviceTypes.filter(deviceType => deviceTypeWhitelist.includes(deviceType))
+    : currentDeviceTypes;
 
-  const nostrPool = new NostrPool(options.relays);
+  console.log("Loaded device types:", loadedDeviceTypes);
 
-  logger.info("Starting device simulation loops...");
-  const deviceLoops = deviceList.map(device => deviceLoop(device, options.interval, nostrPool));
+  await Promise.all(loadedDeviceTypes.map(deviceType => import(`../device-types/${deviceType}.ts`) as unknown as DeviceTypeImportedModule));
+
+  console.log("Starting simulation loops...");
+  const deviceLoops = loadedDeviceTypes.map(deviceType => {
+    const device = new SimulatedDevice(secretKey, deviceType);
+    return deviceLoop(device, interval, nostrPool, options.topic, options.mention);
+  });
   await Promise.all(deviceLoops);
 }
 
-async function deviceLoop(device: SimulatedDevice, interval: number, nostrPool: NostrPool) {
+async function deviceLoop(device: SimulatedDevice, interval: number, nostrPool: NostrPool, topic?: string, mention?: string) {
   const { simulateHassState, processState } = await import(`../device-types/${device.deviceType}.ts`) as DeviceTypeImportedModule;
   await wait(getRandomInt(0, 30000));
 
   while (true) {
-    const hassState = simulateHassState(device);
-    const processedState = processState(hassState);
+    const hassStates = simulateHassState(device);
+    const processedState = processState(hassStates);
 
-    logger.info(`device ${device.deviceId} got state`);
+    console.log(`[${new Date().toISOString()}] Got ${hassStates.length} states from ${device.deviceType}`);
+
     try {
-      await nostrPool.publish(device.createStateEvent(processedState));
-      logger.info(`device ${device.deviceId} published a state`);
+      await nostrPool.publish(device.createStateEvent(processedState, topic, mention));
+      console.log(`[${new Date().toISOString()}] Published event to Nostr${topic ? ` (topic: ${topic})` : ""}${mention ? ` (mention: ${mention})` : ""}`);
+
     } catch (error) {
-      logger.error(`Error publishing state event for device ${device.deviceId}`, error);
+      console.error(`Error publishing state event`, error);
     }
 
     await wait(interval + getRandomInt(-1000, 1000));

@@ -17,7 +17,7 @@ export default async function bridge(options: {
 }, _command: Command) {
   const interval = options.interval;
   const nostrPool = new NostrPool(options.relays);
-  const bridgeDevice = new BridgeDevice(options.secretKey || Deno.env.get("DEPHY_SECRET_KEY") || "", options.topic, options.mention);
+  const bridgeDevice = new BridgeDevice(options.secretKey || Deno.env.get("DEPHY_SECRET_KEY") || "");
   const currentDeviceTypes = await getKnownDeviceTypeList();
 
   const deviceTypeWhitelist = options.deviceTypeWhitelist.map(type => type.trim().toLowerCase());
@@ -41,7 +41,7 @@ export default async function bridge(options: {
   }
 }
 
-async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nostrPool: NostrPool) {
+async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nostrPool: NostrPool, topic?: string, mention?: string) {
   const hassStates = await hassAccessor.getStates();
   // if state not a number, skip
   hassStates.forEach(state => {
@@ -53,7 +53,11 @@ async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nost
 
   console.log(`[${new Date().toISOString()}] Got ${hassStates.length} states`);
 
-  const event = device.createStateEvent(hassStates);
-  await nostrPool.publish(event);
-  console.log(`[${new Date().toISOString()}] Published event to Nostr`);
+  const event = device.createStateEvent(hassStates, topic, mention);
+  try {
+    await nostrPool.publish(event);
+    console.log(`[${new Date().toISOString()}] Published event to Nostr${topic ? ` (topic: ${topic})` : ""}${mention ? ` (mention: ${mention})` : ""}`);
+  } catch (error) {
+    console.error("Error publishing state event", error);
+  }
 }
