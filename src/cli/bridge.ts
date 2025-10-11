@@ -33,7 +33,7 @@ export default async function bridge(options: {
   console.log("Starting bridge loop...");
   while (true) {
     try {
-      await bridgeLoop(bridgeDevice, hassAccessor, nostrPool);
+      await bridgeLoop(bridgeDevice, hassAccessor, nostrPool, options.topic, options.mention);
     } catch (error) {
       console.error("Error in bridge loop", error);
     }
@@ -41,23 +41,34 @@ export default async function bridge(options: {
   }
 }
 
-async function bridgeLoop(device: BridgeDevice, hassAccessor: HassAccessor, nostrPool: NostrPool, topic?: string, mention?: string) {
+async function bridgeLoop(
+  device: BridgeDevice,
+  hassAccessor: HassAccessor,
+  nostrPool: NostrPool,
+  topic?: string,
+  mention?: string
+) {
   const hassStates = await hassAccessor.getStates();
-  // if state not a number, skip
-  hassStates.forEach(state => {
-    if (isNaN(Number(state.truncatedState.state))) {
-      console.log(`${state.truncatedState.entity_id} state is not a number, skipping`);
-      return;
-    }
-  });
+
+  const invalidStates = hassStates.filter(
+    (state) => isNaN(Number(state.truncatedState.state))
+  );
+
+  if (invalidStates.length === hassStates.length) {
+    console.log(`[${new Date().toISOString()}] All ${hassStates.length} states are non-numeric, skipping publish`);
+    return;
+  }
 
   console.log(`[${new Date().toISOString()}] Got ${hassStates.length} states`);
 
   const event = device.createStateEvent(hassStates, topic, mention);
   try {
     await nostrPool.publish(event);
-    console.log(`[${new Date().toISOString()}] Published event to Nostr${topic ? ` (topic: ${topic})` : ""}${mention ? ` (mention: ${mention})` : ""}`);
+    console.log(
+      `[${new Date().toISOString()}] Published event to Nostr${topic ? ` (topic: ${topic})` : ""}${mention ? ` (mention: ${mention})` : ""}`
+    );
   } catch (error) {
     console.error("Error publishing state event", error);
   }
 }
+
